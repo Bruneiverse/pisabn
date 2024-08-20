@@ -18,44 +18,57 @@ if (!file.exists("CY08MSP_CODEBOOK_27thJune24.xlsx")) {
   )
 }
 
-# Download all zip files from OECD website -------------------------------------
-if (!dir.exists("data")) dir.create("data")
-if (!dir.exists("data/_raw")) dir.create("data/_raw")
-# run this code or otherwise browse
-# https://www.oecd.org/en/data/datasets/pisa-2022-database.html 
-# to download one  by one
-zip_files <- c(
-  # Data files
-  "SCH_QQQ_SAS.zip",
-  "STU_QQQ_SAS.zip",
-  "TCH_QQQ_SAS.zip",
-  "STU_COG_SAS.zip",
-  "STU_TIM_SAS.zip",
-  "CRT_SAS.zip",
-  "FLT_SAS.zip",
-  # Compendia
-  "PISA2022_FinalRelease_Compendia_18thJune24.zip",
-  "PISA2022_FinalRelease_Compendia_18thJune24_cog.zip",
-  "PISA2022_FinalRelease_CrT_Compendia_18thJune24.zip",
-  "PISA2022_FinalRelease_FLT_Compendia_27thJune24.zip"
-)
-for (i in seq_along(zip_files)) {
-  if (!file.exists(paste0("data/_raw/", zip_files[i]))) {
-    download.file(
-      paste0("https://webfs.oecd.org/pisa2022/", zip_files[i]),
-      paste0("data/_raw/", zip_files[i])
-    )
+rdata_files <- list.files("data", pattern = ".RData")
+check <- all(rdata_files %in% c(
+  "CY08MSP_CRT_COG.RData", "CY08MSP_FLT_COG.RData",
+  "CY08MSP_FLT_QQQ.RData", "CY08MSP_FLT_TIM.RData",
+  "CY08MSP_SCH_QQQ.RData", "CY08MSP_STU_COG.RData",
+  "CY08MSP_STU_QQQ.RData", "CY08MSP_STU_TIM.RData",
+  "CY08MSP_TCH_QQQ.RData"
+))
+
+if (!check) {
+  # Download all zip files from OECD website -----------------------------------
+  if (!dir.exists("data")) dir.create("data")
+  if (!dir.exists("data/_raw")) dir.create("data/_raw")
+  # run this code or otherwise browse
+  # https://www.oecd.org/en/data/datasets/pisa-2022-database.html 
+  # to download one  by one
+  zip_files <- c(
+    # Data files
+    "SCH_QQQ_SAS.zip",
+    "STU_QQQ_SAS.zip",
+    "TCH_QQQ_SAS.zip",
+    "STU_COG_SAS.zip",
+    "STU_TIM_SAS.zip",
+    "CRT_SAS.zip",
+    "FLT_SAS.zip",
+    # Compendia
+    "PISA2022_FinalRelease_Compendia_18thJune24.zip",
+    "PISA2022_FinalRelease_Compendia_18thJune24_cog.zip",
+    "PISA2022_FinalRelease_CrT_Compendia_18thJune24.zip",
+    "PISA2022_FinalRelease_FLT_Compendia_27thJune24.zip"
+  )
+  for (i in seq_along(zip_files)) {
+    if (!file.exists(paste0("data/_raw/", zip_files[i]))) {
+      download.file(
+        paste0("https://webfs.oecd.org/pisa2022/", zip_files[i]),
+        paste0("data/_raw/", zip_files[i])
+      )
+    }
+  }
+  
+  # Unzip all files ------------------------------------------------------------
+  files_to_unzip <- list.files("data/_raw", pattern = ".zip", full.names = TRUE)
+  for (i in seq_along(files_to_unzip)) {
+    the_file <- tools::file_path_sans_ext(basename(files_to_unzip[i]))
+    if (!dir.exists(paste0("data/", the_file))) {
+      unzip(
+        zipfile = files_to_unzip[i], 
+        exdir = paste0("data/", the_file)
+      )
+    }
   }
 }
 
-# Unzip all files --------------------------------------------------------------
-files_to_unzip <- list.files("data/_raw", pattern = ".zip", full.names = TRUE)
-for (i in seq_along(files_to_unzip)) {
-  the_file <- tools::file_path_sans_ext(basename(files_to_unzip[i]))
-  if (!dir.exists(paste0("data/", the_file))) {
-    unzip(
-      zipfile = files_to_unzip[i], 
-      exdir = paste0("data/", the_file)
-    )
-  }
-}
+
