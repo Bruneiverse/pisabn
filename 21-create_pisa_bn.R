@@ -53,7 +53,7 @@ pisa_bn_math <-
   drop_na() |>
   arrange(school)
   
-write_csv(pisa_bn_math, file = "pisa_bn_math.csv")
+write_csv(pisa_bn_math, file = "data/pisa_bn_math.csv")
 
 # ggplot(pisa_bn_math, aes(escs, score, col = school)) +
 #   geom_point(size = 2, alpha = 0.5) +
