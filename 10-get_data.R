@@ -20,7 +20,7 @@ if (!file.exists("CY08MSP_CODEBOOK_27thJune24.xlsx")) {
 
 # Download all zip files from OECD website -------------------------------------
 if (!dir.exists("data")) dir.create("data")
-if (!dir.exists("data/raw")) dir.create("data/raw")
+if (!dir.exists("data/_raw")) dir.create("data/_raw")
 # run this code or otherwise browse
 # https://www.oecd.org/en/data/datasets/pisa-2022-database.html 
 # to download one  by one
@@ -40,23 +40,22 @@ zip_files <- c(
   "PISA2022_FinalRelease_FLT_Compendia_27thJune24.zip"
 )
 for (i in seq_along(zip_files)) {
-  if (!file.exists(paste0("data/raw/", zip_files[i]))) {
+  if (!file.exists(paste0("data/_raw/", zip_files[i]))) {
     download.file(
       paste0("https://webfs.oecd.org/pisa2022/", zip_files[i]),
-      paste0("data/raw/", zip_files[i])
+      paste0("data/_raw/", zip_files[i])
     )
   }
 }
 
 # Unzip all files --------------------------------------------------------------
-files_to_unzip <- list.files("data/raw", pattern = ".zip", full.names = TRUE)
+files_to_unzip <- list.files("data/_raw", pattern = ".zip", full.names = TRUE)
 for (i in seq_along(files_to_unzip)) {
-  unzip(
-    zipfile = files_to_unzip[i], 
-    exdir = paste0(
-      "data/", 
-      tools::file_path_sans_ext(basename(files_to_unzip[i]))
+  the_file <- tools::file_path_sans_ext(basename(files_to_unzip[i]))
+  if (!dir.exists(paste0("data/", the_file))) {
+    unzip(
+      zipfile = files_to_unzip[i], 
+      exdir = paste0("data/", the_file)
     )
-  )
+  }
 }
- 

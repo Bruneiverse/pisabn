@@ -1,31 +1,32 @@
 library(tidyverse)
 LETTERS676 <- c(sapply(LETTERS, function(x) paste0(x, LETTERS)))
+load("data/CY08MSP_STU_COG.RData")
+load("data/CY08MSP_STU_QQQ.RData")
+load("data/CY08MSP_SCH_QQQ.RData")
 
-pisa_bn_stu <- haven::read_sas("STU_QQQ_SAS/cy08msp_stu_qqq.sas7bdat") |>
-  filter(CNT == "BRN")
-pisa_bn_sch <- haven::read_sas("SCH_QQQ_SAS/cy08msp_sch_qqq.sas7bdat") |>
-  filter(CNT == "BRN")
-pisa_bn_cog <- haven::read_sas("STU_COG_SAS/CY08MSP_STU_COG.SAS7BDAT") |>
-  filter(CNT == "BRN")
+# What are the country codes?
+unique(CY08MSP_STU_COG$CNT)
 
-# Export raw data to csv for FYP students to analyse ---------------------------
-write_csv(pisa_bn_stu, file = "raw/pisa_bn_stu.csv")
-write_csv(pisa_bn_sch, file = "raw/pisa_bn_sch.csv")
-write_csv(pisa_bn_cog, file = "raw/pisa_bn_cog.csv")
+# Filter for Brunei
+pisa_bn_cog <- filter(CY08MSP_STU_COG, CNT == "BRN")
+pisa_bn_stu <- filter(CY08MSP_STU_QQQ, CNT == "BRN")
+pisa_bn_sch <- filter(CY08MSP_SCH_QQQ, CNT == "BRN")
 
-# My way of computing the math scores ------------------------------------------
-labels_list <- map(seq_len(ncol(pisa_bn_cog)), 
-                   \(x) attr(pisa_bn_cog[[x]], "label"))
+# My way of computing the cognitive scores -------------------------------------
+labels_list <- 
+  map(
+    seq_len(ncol(pisa_bn_cog)), 
+    \(x) attr(pisa_bn_cog[[x]], "label")
+  )
 idx <- which(grepl("\\(Scored Response\\)", labels_list))
 
-
-pisa_bn_cog <- pisa_bn_cog[, c(1:(min(idx) - 1), idx)]
-
 math_score <-
-  pisa_bn_cog[, -(1:33)] |>
+  pisa_bn_cog[, idx] |>
   mutate(across(everything(), \(x) as.numeric(x > 0))) |>
   mutate(score = round(100 * rowMeans(across(everything()), na.rm = TRUE), 0)) |>
   pull(score)
+
+pisa_bn_cog <- pisa_bn_cog[, c(1:(min(idx) - 1), idx)]
 
 # Add student and school variables ---------------------------------------------
 pisa_bn_math <-
@@ -53,7 +54,6 @@ pisa_bn_math <-
   arrange(school)
   
 write_csv(pisa_bn_math, file = "pisa_bn_math.csv")
-
 
 # ggplot(pisa_bn_math, aes(escs, score, col = school)) +
 #   geom_point(size = 2, alpha = 0.5) +
