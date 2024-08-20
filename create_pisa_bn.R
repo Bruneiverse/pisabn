@@ -8,6 +8,11 @@ pisa_bn_sch <- haven::read_sas("SCH_QQQ_SAS/cy08msp_sch_qqq.sas7bdat") |>
 pisa_bn_cog <- haven::read_sas("STU_COG_SAS/CY08MSP_STU_COG.SAS7BDAT") |>
   filter(CNT == "BRN")
 
+# Export raw data to csv for FYP students to analyse ---------------------------
+write_csv(pisa_bn_stu, file = "raw/pisa_bn_stu.csv")
+write_csv(pisa_bn_sch, file = "raw/pisa_bn_sch.csv")
+write_csv(pisa_bn_cog, file = "raw/pisa_bn_cog.csv")
+
 # My way of computing the math scores ------------------------------------------
 labels_list <- map(seq_len(ncol(pisa_bn_cog)), 
                    \(x) attr(pisa_bn_cog[[x]], "label"))
