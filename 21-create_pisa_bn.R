@@ -12,6 +12,22 @@ pisa_bn_cog <- filter(CY08MSP_STU_COG, CNT == "BRN")
 pisa_bn_stu <- filter(CY08MSP_STU_QQQ, CNT == "BRN")
 pisa_bn_sch <- filter(CY08MSP_SCH_QQQ, CNT == "BRN")
 
+pisa_asean_cog <- filter(
+  CY08MSP_STU_COG,
+  CNT %in% c("BRN", "MYS", "PHL")
+)
+# etc. for the stu and sch data
+
+
+
+
+
+
+
+
+
+
+
 # My way of computing the cognitive scores -------------------------------------
 labels_list <- 
   map(
