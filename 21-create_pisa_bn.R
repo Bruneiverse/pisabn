@@ -21,6 +21,25 @@ pisa_asean_cog <- filter(
 )
 # etc. for the stu and sch data
 
+# cog_data <-
+  select(
+    pisa_bn_cog,
+    CM033Q01S,
+    
+  )
+
+# see below
+stu_data <-
+  select(
+    pisa_bn_stu,
+    ST004D01T, 
+    ST254Q06JA,
+    ...
+  )
+
+
+
+
 
 
 
@@ -33,50 +52,52 @@ pisa_asean_cog <- filter(
 
 # My way of computing the cognitive scores -------------------------------------
 labels_list <- 
-  map(
+  unlist(map(
     seq_len(ncol(pisa_bn_cog)), 
     \(x) attr(pisa_bn_cog[[x]], "label")
-  )
-idx <- which(grepl("\\(Scored Response\\)", labels_list))
+  ))
+# idx <- which(grepl("\\(Scored Response\\)", labels_list))
+
+check_SR <- grepl("\\(Scored Response\\)", labels_list)
+check_CM <- grepl("CM", colnames(pisa_bn_cog))
+check <- check_SR & check_CM
+idx <- which(check)
+
+cog_data <- pisa_bn_cog[, idx]
 
 math_score <-
-  pisa_bn_cog[, idx] |>
+  cog_data |>
   mutate(across(everything(), \(x) as.numeric(x > 0))) |>
   mutate(score = round(100 * rowMeans(across(everything()), na.rm = TRUE), 0)) |>
   pull(score)
 
-pisa_bn_cog <- pisa_bn_cog[, c(1:(min(idx) - 1), idx)]
+# pisa_bn_cog <- pisa_bn_cog[, c(1:(min(idx) - 1), idx)]
 
 # Add student and school variables ---------------------------------------------
 pisa_bn_math <-
   pisa_bn_stu |>
-  mutate(score = math_score) |>
   left_join(pisa_bn_sch) |>
   select(
-    score = score,
     school = CNTSCHID, 
     gender = ST004D01T, 
     age = AGE,
     bullied = BULLIED,
     escs = ESCS,
-    skip_sch = SKIPPING
-  ) |> 
-  mutate(
-    gender = case_when(
-      gender == 1 ~ "F",
-      gender == 2 ~ "M",
-      TRUE ~ NA
-    ) |> factor(),
-    school = LETTERS676[as.numeric(factor(school))]
-  ) |>
-  drop_na() |>
-  arrange(school)
+    skip_sch = SKIPPING,
+    # continue here
+  ) |>   
+  mutate(score = math_score)
   
-write_csv(pisa_bn_math, file = "data/pisa_bn_math.csv")
+# example model
+mod <- lm(score ~ escs, data = pisa_bn_math)  
+ggplot(pisa_bn_math, aes(escs, score, col = school)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "red") +
+  scale_colour_viridis_c()
 
-# ggplot(pisa_bn_math, aes(escs, score, col = school)) +
-#   geom_point(size = 2, alpha = 0.5) +
-#   geom_smooth(method = "lm", se = FALSE) +
-#   scale_colour_viridis_d() +
-#   theme_bw() +
-#   theme(legend.position = "none")
+
+
+
+  
+  
+
