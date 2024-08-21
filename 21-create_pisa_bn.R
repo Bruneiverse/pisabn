@@ -3,15 +3,18 @@ LETTERS676 <- c(sapply(LETTERS, function(x) paste0(x, LETTERS)))
 load("data/CY08MSP_STU_COG.RData")
 load("data/CY08MSP_STU_QQQ.RData")
 load("data/CY08MSP_SCH_QQQ.RData")
+load("data/pisa_bn.RData")  # load pisa bn data
 
 # What are the country codes?
 unique(CY08MSP_STU_COG$CNT)
 
 # Filter for Brunei
-pisa_bn_cog <- filter(CY08MSP_STU_COG, CNT == "BRN")
-pisa_bn_stu <- filter(CY08MSP_STU_QQQ, CNT == "BRN")
-pisa_bn_sch <- filter(CY08MSP_SCH_QQQ, CNT == "BRN")
+# pisa_bn_cog <- filter(CY08MSP_STU_COG, CNT == "BRN")
+# pisa_bn_stu <- filter(CY08MSP_STU_QQQ, CNT == "BRN")
+# pisa_bn_sch <- filter(CY08MSP_SCH_QQQ, CNT == "BRN")
+# save(pisa_bn_cog, pisa_bn_stu, pisa_bn_sch, file = "data/pisa_bn.RData")
 
+# Filter for ASEAN countries
 pisa_asean_cog <- filter(
   CY08MSP_STU_COG,
   CNT %in% c("BRN", "MYS", "PHL")
