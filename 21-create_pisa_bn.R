@@ -17,8 +17,11 @@ unique(CY08MSP_STU_COG$CNT)
 # Filter for ASEAN countries
 pisa_asean_cog <- filter(
   CY08MSP_STU_COG,
-  CNT %in% c("BRN", "MYS", "PHL")
+  CNT %in% c("BRN", "MYS", "PHL")  # insert more countries as needed
 )
+pisa_asean_stu <- ...
+pisa_asean_sch <- ...
+
 # etc. for the stu and sch data
 
 # cog_data <-
@@ -50,7 +53,7 @@ stu_data <-
 
 
 
-# My way of computing the cognitive scores -------------------------------------
+# My way of computing the maths scores -----------------------------------------
 labels_list <- 
   unlist(map(
     seq_len(ncol(pisa_bn_cog)), 
@@ -74,7 +77,7 @@ math_score <-
 # pisa_bn_cog <- pisa_bn_cog[, c(1:(min(idx) - 1), idx)]
 
 # Add student and school variables ---------------------------------------------
-pisa_bn_math <-
+pisa_bn_math <-  # Haziqah rename this to pisa_asean_math
   pisa_bn_stu |>
   left_join(pisa_bn_sch) |>
   select(
@@ -88,6 +91,14 @@ pisa_bn_math <-
   ) |>   
   mutate(score = math_score)
   
+write_csv(pisa_bn_math, "data/pisa_bn_math.csv", na = "")
+
+
+
+# Farhanah 
+# What are the names of the variables from the pisa_bn_sch data set
+
+
 # example model
 mod <- lm(score ~ escs, data = pisa_bn_math)  
 ggplot(pisa_bn_math, aes(escs, score, col = school)) +
