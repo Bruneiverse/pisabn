@@ -46,6 +46,7 @@ pisa_bn_irt <-
     skip_sch = SKIPPING
     # continue here for other data
   ) |>
-  left_join(pisa_bn_cog, by = join_by(id == CNTSTUID), keep = FALSE)  # combine cognitive data
+  left_join(pisa_bn_cog, by = join_by(id == CNTSTUID), keep = FALSE) |> # combine cognitive data
+  arrange(school, id, stratum) |> View()
   
-write_csv(pisa_bn_math, "data/pisa_bn_math.csv", na = "")
+write_csv(pisa_bn_irt, "data/pisa_bn_irt.csv", na = "")
