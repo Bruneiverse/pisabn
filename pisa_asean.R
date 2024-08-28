@@ -1,27 +1,29 @@
 library(tidyverse)
-LETTERS676 <- c(sapply(LETTERS, function(x) paste0(x, LETTERS)))
 load("data/CY08MSP_STU_COG.RData")
 load("data/CY08MSP_STU_QQQ.RData")
 load("data/CY08MSP_SCH_QQQ.RData")
-load("data/pisa_bn.RData")  # load pisa bn data
 
 # What are the country codes?
 unique(CY08MSP_STU_COG$CNT)
 
 # Filter for ASEAN countries
+asean_cnt <- c("BRN", "KHM", "IDN", "MYS", "PHL", "SGP", "VNM", "THA")
+
 pisa_asean_cog <- filter(
   CY08MSP_STU_COG,
-  CNT %in% c("BRN", "KHM", "IDN", "MYS", "PHL", "SGP", "VNM", "THA")
+  CNT %in% asean_cnt
 )   
 
 pisa_asean_stu <- filter(
-  CY08MSP_STU_QQQ, CNT %in% c("BRN", "KHM", "IDN", "MYS", "PHL", "SGP", "VNM", "THA")
+  CY08MSP_STU_QQQ, CNT %in% asean_cnt
 )
 
 pisa_asean_sch <- filter(
   CY08MSP_SCH_QQQ, 
-  CNT %in% c("BRN", "KHM", "IDN", "MYS", "PHL", "SGP", "VNM", "THA")
+  CNT %in% asean_cnt
 )
+
+# save(pisa_asean_cog, pisa_asean_stu, pisa_asean_sch, file = "data/pisa_asean.RData")
 
 # My way of computing the maths scores -----------------------------------------
 labels_list <- 
@@ -48,11 +50,10 @@ math_score <-
 names(pisa_asean_stu) #Just to check the questionnaire label
 names(pisa_asean_sch)
 
-
 # Add student and school variables ---------------------------------------------
-pisa_asean_math <-  # Haziqah rename this to pisa_asean_math
+pisa_asean_math <-  
   pisa_asean_stu |>
-  left_join(pisa_asean_sch) |>
+  # left_join(pisa_asean_sch) |>
   select(
     country = CNT, 
     gender = ST004D01T,
@@ -68,10 +69,28 @@ pisa_asean_math <-  # Haziqah rename this to pisa_asean_math
     family_interest_in_school_problem = ST300Q05JA,
     family_interest_in_school_learning = ST300Q08JA
   ) |>   
-  mutate(score = math_score)
+  mutate(score = math_score) |>
+  # ADD FACTORS
+  mutate(
+    gender = factor(gender, labels = c("Female", "Male")),
+    # FIXME: Add the rest here
+  )
 
 write_csv(pisa_asean_math, "data/pisa_asean_math.csv", na = "")
 
+# Summary statistics -----------------------------------------------------------
+pisa_asean_math |>
+  group_by(country) |>
+  summarise(
+    mean = mean(score, na.rm = TRUE),
+    sd = sd(score, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  ) |>
+  arrange(desc(mean))
 
-
-
+# Model ------------------------------------------------------------------------
+mod <- lm(
+  formula = score ~ gender + country,
+  data = pisa_asean_math
+)
