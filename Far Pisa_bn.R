@@ -1,24 +1,5 @@
-# Farhanah
-
-
-# cog_data <-
-select(
-  pisa_bn_cog,
-  CM033Q01S,
-  
-)
-
-
-
-# see below
-stu_data <-
-  select(
-    pisa_bn_stu,
-    ST004D01T, 
-    ST254Q06JA,
-    ...
-  )
-
+library(tidyverse)
+load("data/pisa_bn.RData")  # load pisa bn data
 
 # My way of computing the maths scores -----------------------------------------
 labels_list <- 
@@ -41,12 +22,9 @@ math_score <-
   mutate(score = round(100 * rowMeans(across(everything()), na.rm = TRUE), 0)) |>
   pull(score)
 
-# pisa_bn_cog <- pisa_bn_cog[, c(1:(min(idx) - 1), idx)]
-
 # Add student and school variables ---------------------------------------------
-pisa_bn_math <-  # Haziqah rename this to pisa_asean_math
+pisa_bn_math <-  
   pisa_bn_stu |>
-  left_join(pisa_bn_sch) |>
   select(
     school = CNTSCHID, 
     gender = ST004D01T, 
@@ -60,20 +38,12 @@ pisa_bn_math <-  # Haziqah rename this to pisa_asean_math
     mother = ST005Q01JA,
     father = ST007Q01JA,
     language = ST022Q01TA,
-    
-    
   ) |>   
   mutate(score = math_score)
 
-write_csv(pisa_bn_math, "data/pisa_bn_math.csv", na = "")
-
-
-
-# Farhanah 
 # What are the names of the variables from the pisa_bn_sch data set
-
-pisa_bn_math <-
-pisa_bn_sch |>
+pisa_bn_sch2 <-
+  pisa_bn_sch |>
   select(
     school = CNTSCHID,
     location = SC001Q01TA,
@@ -87,22 +57,36 @@ pisa_bn_sch |>
     immigrant_students = SC211Q04JA,
     immigrant_parents = SC211Q05JA,
     refugee_students = SC211Q06JA,
-    
     )
-    
-    
 
-# example model
-mod <- lm(score ~ escs, data = pisa_bn_math)  
-ggplot(pisa_bn_math, aes(escs, score, col = school)) +
-  geom_point() +
-  geom_smooth(method = "lm", col = "red") +
-  scale_colour_viridis_c()
+# Merge the two data sets
+pisa_bn_math <- 
+  left_join(pisa_bn_math, pisa_bn_sch2, by = "school") |>
+  drop_na()
 
+# Need to convert to factors
+pisa_bn_math <-
+  pisa_bn_math |>
+  mutate(
+    gender = factor(gender, labels = c("Female", "Male")),
+    # FIXME: ADD THE REST HERE
+  )
 
+# Write the data set to a csv file
+write_csv(pisa_bn_math, "data/pisa_bn_math.csv", na = "")
 
+# Multilevel model -------------------------------------------------------------
+library(lme4)
+library(lmerTest)
 
+# A simple linear model
+mod0 <- lm(
+  formula = score ~ escs + gender + skip_sch,
+  data = pisa_bn_math
+)
 
-
-
-
+# Multilevel model
+mod <- lmer(
+  formula = score ~ escs + gender + skip_sch + (1 | school),
+  data = pisa_bn_math
+)
