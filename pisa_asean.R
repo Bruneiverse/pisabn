@@ -57,7 +57,7 @@ pisa_asean_math <-
   select(
     country = CNT, 
     gender = ST004D01T,
-    mat_deg = ST006Q03JA,
+    mat_deg = ST006Q03JA, 
     pat_deg = ST008Q03JA,
     stu_help = ST270Q02JA,
     stu_safe = ST265Q03JA,
@@ -70,8 +70,15 @@ pisa_asean_math <-
   # ADD FACTORS
   mutate(
     gender = factor(gender, labels = c("Female", "Male")),
-    # FIXME: Add the rest here
-  )
+    mat_deg = factor(mat_deg, labels= c("Yes","No")),
+    pat_deg= factor(pat_deg, labels= c("Yes","No")),
+    stu_help= factor(stu_help, labels= c( "Every lesson","Most lessons", "Some lessons","Never or almost never" )),
+    stu_safe= factor (stu_safe, labels= c("Strongly agree","Agree","Disagree","Strongly Disagree")),
+    stu_eff= factor (stu_eff, labels= c("Strongly Disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly Agree")),
+    math_ext= factor (math_ext, labels= c("Frequently", "Sometimes", "Rarely", "Never")),
+    math_itp= factor(math_itp, labels= c("Frequently", "Sometimes", "Rarely", "Never")),
+    fam_eng= factor(fam_eng, labels= c("Never or almost never", "About once or twice a year", "About once or twice a month", "About once or twice a week", "Every day or almost every day"))
+    )
 
 write_csv(pisa_asean_math, "data/pisa_asean_math.csv", na = "")
 
