@@ -89,6 +89,25 @@ pisa_asean_math |>
   ) |>
   arrange(desc(mean))
 
+#check why KHM and VNM give NaN 
+
+pisa_asean_math |>
+  filter(country %in% c("KHM", "VNM")) |>
+  summarise(
+    total = n(),
+    missing = sum(is.na(score)),
+    valid = total - missing
+  ) #return: score data are missing for both of the countries
+#find way how to view khm and vnm column in cog file
+
+# Filter for KHM and VNM
+cog_khm_vnm <- pisa_asean_cog %>%
+  filter(CNT %in% c("KHM", "VNM")) #show that NA for the related data
+
+
+
+
+
 # Model ------------------------------------------------------------------------
 mod <- lm(
   formula = score ~ gender + country,
