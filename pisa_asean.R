@@ -57,17 +57,14 @@ pisa_asean_math <-
   select(
     country = CNT, 
     gender = ST004D01T,
-    number_of_smartphones = ST254Q06JA,
-    mother_qualification = ST006Q03JA,
-    father_qualification = ST008Q03JA,
-    student_well_being = ST267Q07JA,
-    student_safety = ST265Q03JA,
-    student_effort = ST307Q02JA,
-    student_passion = ST301Q05JA,
-    assigned_everyday_maths_problems = ST283Q06JA,
-    real_life_maths_task = ST276Q02JA,
-    family_interest_in_school_problem = ST300Q05JA,
-    family_interest_in_school_learning = ST300Q08JA
+    mat_deg = ST006Q03JA,
+    pat_deg = ST008Q03JA,
+    stu_help = ST270Q02JA,
+    stu_safe = ST265Q03JA,
+    stu_eff = ST307Q02JA,
+    math_ext = ST276Q01JA,
+    math_itp = ST276Q02JA,
+    fam_eng = ST300Q08JA
   ) |>   
   mutate(score = math_score) |>
   # ADD FACTORS
