@@ -67,6 +67,10 @@ pisa_bn_math <-
   pisa_bn_math |>
   mutate(
     gender = factor(gender, labels = c("Female", "Male")),
+    devices = factor(devices, labels = c("None", "One", "Two", "Three", "Four", "Five", "6:10", "Greater than 10")),
+    mother = factor(mother, labels = c("ISCED level 3.4", "ISCED level 3.3", "ISCED level 2", "ISCED level 1", "She did not complete ISCED level 1")),
+    father = factor(father, labels = c("ISCED level 3.4", "ISCED level 3.3", "ISCED level 2", "ISCED level 1", "She did not complete ISCED level 1")),
+    language = factor(language, labels = c("language 1", "language 2", "language 3", "...etc.", "other language")),
     sch_type = factor(sch_type, labels = c("Public", "Private")),
     stu_ses = factor(labels = c("her_lang", "spe_learn", "unpri_house", "img_stu", "img_prnt", "ref_stu")
   ))
