@@ -105,6 +105,10 @@ pisa_asean_math |>
 
 # Model ------------------------------------------------------------------------
 mod <- lm(
-  formula = score ~ gender + country,
+  formula = 
+    score ~ gender + country + mat_deg + 
+    pat_deg + stu_help + stu_safe +
+    stu_eff + math_ext + math_itp + fam_eng,
   data = pisa_asean_math
 )
+summary(mod)
