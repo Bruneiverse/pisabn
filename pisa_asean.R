@@ -112,3 +112,4 @@ mod <- lm(
   data = pisa_asean_math
 )
 summary(mod)
+#observations: only country, stu_safe, stu_eff and math_ext seems to significantly impact scores.
