@@ -109,7 +109,23 @@ mod <- lm(
     score ~ gender + country + mat_deg + 
     pat_deg + stu_help + stu_safe +
     stu_eff + math_ext + math_itp + fam_eng,
-  data = pisa_asean_math
+  data = drop_na(pisa_asean_math)
 )
 summary(mod)
 #observations: only country, stu_safe, stu_eff and math_ext seems to significantly impact scores.
+
+mod_step <- step(mod)
+summary(mod_step)
+
+
+
+
+
+
+
+# interaction effect
+mod <- lm(
+  formula = score ~ country * (fam_eng),
+  data = pisa_asean_math
+)
+summary(mod)

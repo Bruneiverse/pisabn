@@ -28,8 +28,8 @@ pisa_bn_math <-
   select(
     school = CNTSCHID, 
     gender = ST004D01T, 
-    bullied = SCORE,
-    escs = FACTORS,
+    bullied = BULLIED,
+    escs = ESCS,
     skip_sch = SKIPPING,
     devices = ST253Q01JA,
     books = ST255Q01JA,
@@ -70,10 +70,9 @@ pisa_bn_math <-
     devices = factor(devices, labels = c("None", "One", "Two", "Three", "Four", "Five", "6:10", "Greater than 10")),
     mother = factor(mother, labels = c("ISCED level 3.4", "ISCED level 3.3", "ISCED level 2", "ISCED level 1", "She did not complete ISCED level 1")),
     father = factor(father, labels = c("ISCED level 3.4", "ISCED level 3.3", "ISCED level 2", "ISCED level 1", "She did not complete ISCED level 1")),
-    language = factor(language, labels = c("language 1", "language 2", "language 3", "...etc.", "other language")),
-    sch_type = factor(sch_type, labels = c("Public", "Private")),
-    stu_ses = factor(labels = c("her_lang", "spe_learn", "unpri_house", "img_stu", "img_prnt", "ref_stu")
-  ))
+    language = factor(language, labels = c("Language of the test", "Other languages")),
+    sch_type = factor(sch_type, labels = c("Public", "Private"))
+  )
 
 # Write the data set to a csv file
 write_csv(pisa_bn_math, "data/pisa_bn_math.csv", na = "")
@@ -84,9 +83,7 @@ library(lmerTest)
 
 # A simple linear model
 mod0 <- lm(
-  formula = score ~ escs + gender + skip_sch + devices + books +
-            mother + father + language + sch_type + her_lang + spe_learn +
-            unpri_house + img_stu + img_prnt + ref_stu,
+  formula = score ~ gender + skip_sch + devices + mother + father + language + sch_type + unpri_house,
   data = pisa_bn_math
 )
 summary(mod0)
@@ -95,11 +92,32 @@ summary(mod0)
 mod <- lmer(
   formula = score ~ escs + gender + skip_sch + devices + books +
     mother + father + language + sch_type + her_lang + spe_learn +
-    unpri_house + img_stu + img_prnt + ref_stu, (1 | school),
+    unpri_house + img_stu + img_prnt + ref_stu + (1 | school),
   data = pisa_bn_math
 )
 
+step(mod)
+
+mod <- lmer(
+  formula = score ~ gender + skip_sch + devices + mother + father + language + sch_type + unpri_house + (1 | school),
+  data = pisa_bn_math
+)
+summary(mod)
+
+
 anova(mod, mod0)
+# What to write
+# 
+# Significance of random intercept model
+# 1. Significance of the variance of the school level effects. u ~ N(0, sigma_u^2) -- THERE DO EXIST variation in school wrt scores.
+# 2. Write about the "range" of possible max/min scores due to school level effects.
+# 3. Find some tutorials online that make use of lme4 plots.
+# 
+# Interpreting the fixed effects
+# 1. Look at regression table and make story
+# 
+
+
 
 
 
