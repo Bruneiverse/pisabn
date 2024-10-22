@@ -1,4 +1,6 @@
 library(tidyverse)
+
+# Load PISA data
 load("data/CY08MSP_STU_COG.RData")
 load("data/CY08MSP_STU_QQQ.RData")
 load("data/CY08MSP_SCH_QQQ.RData")
@@ -23,37 +25,51 @@ pisa_asean_sch <- filter(
   CNT %in% asean_cnt
 )
 
+# Sample size
+
+nrow(pisa_asean_cog)
+nrow(pisa_asean_stu)
+nrow(pisa_asean_sch)
+
 # save(pisa_asean_cog, pisa_asean_stu, pisa_asean_sch, file = "data/pisa_asean.RData")
 
-# My way of computing the maths scores -----------------------------------------
+# Computing the maths scores-------------------------------------------------------- 
 labels_list <- 
   unlist(map(
     seq_len(ncol(pisa_asean_cog)), 
     \(x) attr(pisa_asean_cog[[x]], "label")
   ))
+
 # idx <- which(grepl("\\(Scored Response\\)", labels_list))
 
 check_SR <- grepl("\\(Scored Response\\)", labels_list)
 check_CM <- grepl("CM", colnames(pisa_asean_cog))
-check <- check_SR & check_CM
-idx <- which(check)
 
-cog_data <- pisa_asean_cog[, idx]
+check1 <- check_SR & check_CM 
+
+check_PSR <- grepl("\\(Paper Scored Response\\)", labels_list) 
+check_PM <- grepl("PM", colnames(pisa_asean_cog))
+
+check2 <- check_PSR & check_PM
+
+idx1 <- which(check1)
+idx2 <- which(check2)
+
+# Combine the indices and subset based on them
+combined_idx <- unique(c(idx1, idx2))  # Use unique to avoid duplicates
+cog_data <- pisa_asean_cog[, combined_idx]
+
 
 math_score <-
   cog_data |>
   mutate(across(everything(), \(x) as.numeric(x > 0))) |>
   mutate(score = round(100 * rowMeans(across(everything()), na.rm = TRUE), 0)) |>
   pull(score)
-#pisa_asean_cog <- pisa_asean_cog[, c(1:(min(idx) - 1), idx)]
 
-names(pisa_asean_stu) #Just to check the questionnaire label
-names(pisa_asean_sch)
+# Independent variables based of student questionnaire----------------------------------------------------------------------------------
 
-# Add student and school variables ---------------------------------------------
 pisa_asean_math <-  
   pisa_asean_stu |>
-  # left_join(pisa_asean_sch) |>
   select(
     country = CNT, 
     gender = ST004D01T,
@@ -70,14 +86,14 @@ pisa_asean_math <-
   # ADD FACTORS
   mutate(
     gender = factor(gender, labels = c("Female", "Male")),
-    mat_deg = factor(mat_deg, labels= c("Yes","No")),
-    pat_deg= factor(pat_deg, labels= c("Yes","No")),
-    stu_help= factor(stu_help, labels= c( "Every lesson","Most lessons", "Some lessons","Never or almost never" )),
-    stu_safe= factor (stu_safe, labels= c("Strongly agree","Agree","Disagree","Strongly Disagree")),
-    stu_eff= factor (stu_eff, labels= c("Strongly Disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly Agree")),
-    math_ext= factor (math_ext, labels= c("Frequently", "Sometimes", "Rarely", "Never")),
-    math_itp= factor(math_itp, labels= c("Frequently", "Sometimes", "Rarely", "Never")),
-    fam_eng= factor(fam_eng, labels= c("Never or almost never", "About once or twice a year", "About once or twice a month", "About once or twice a week", "Every day or almost every day"))
+    mat_deg = factor(mat_deg, labels = c("Yes","No")),
+    pat_deg = factor(pat_deg, labels = c("Yes","No")),
+    stu_help = factor(stu_help, labels = c( "Every lesson","Most lessons", "Some lessons","Never or almost never" )),
+    stu_safe = factor (stu_safe, labels = c("Strongly agree","Agree","Disagree","Strongly Disagree")),
+    stu_eff = factor (stu_eff, labels = c("Strongly Disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly Agree")),
+    math_ext = factor (math_ext, labels = c("Frequently", "Sometimes", "Rarely", "Never")),
+    math_itp = factor(math_itp, labels = c("Frequently", "Sometimes", "Rarely", "Never")),
+    fam_eng = factor(fam_eng, labels = c("Never or almost never", "About once or twice a year", "About once or twice a month", "About once or twice a week", "Every day or almost every day"))
     )
 
 write_csv(pisa_asean_math, "data/pisa_asean_math.csv", na = "")
