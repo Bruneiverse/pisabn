@@ -96,28 +96,134 @@ mod <- lmer(
   data = pisa_bn_math
 )
 
+summary(mod)
 step(mod)
 
-mod <- lmer(
-  formula = score ~ gender + skip_sch + devices + mother + father + language + sch_type + unpri_house + (1 | school),
-  data = pisa_bn_math
-)
-summary(mod)
-
-
 anova(mod, mod0)
-# What to write
-# 
-# Significance of random intercept model
-# 1. Significance of the variance of the school level effects. u ~ N(0, sigma_u^2) -- THERE DO EXIST variation in school wrt scores.
-# 2. Write about the "range" of possible max/min scores due to school level effects.
-# 3. Find some tutorials online that make use of lme4 plots.
-# 
-# Interpreting the fixed effects
-# 1. Look at regression table and make story
-# 
+
+# Load necessary libraries
+library(lme4)
+library(tibble)
+
+# Fit the multilevel model
+model2 <- lmer(math_score ~ escs + skip_sch + gender + (1 | school), data = pisa_bn_stu)
+
+# Extract fixed effects
+fixed_effects <- summary(model2)$coefficients
+
+# Create tibble for fixed effects
+fixed_effects_data <- tibble(
+  Effect = rownames(fixed_effects),                   # Effect names
+  Estimate = fixed_effects[, "Estimate"],             # Coefficient estimates
+  `Std. Error` = fixed_effects[, "Std. Error"],       # Standard errors
+  df = fixed_effects[, "df"],                         # Degrees of freedom
+  `t value` = fixed_effects[, "t value"],             # t-values
+  `Pr(>|t|)` = format.pval(fixed_effects[, "Pr(>|t|)"], digits = 3)  # p-values (formatted)
+)
+
+# View the result
+fixed_effects_data
+
+
+# Load the necessary package if not already loaded
+library(dplyr)
+# Calculate means
+means <- pisa_bn_math %>%
+  summarise(
+    mean_score = mean(score, na.rm = TRUE),
+    mean_escs = mean(escs, na.rm = TRUE),
+    mean_genderMale = mean(gender == "Male", na.rm = TRUE),  # Assuming 'gender' is a character variable
+    mean_skip_sch = mean(skip_sch, na.rm = TRUE)
+  )
+print(means)
+
+# Load necessary libraries
+library(tibble)
+library(gtsummary)
+# Create the data frame with the fixed effects data
+fixed_effects_data <- tribble(
+  ~Effect,       ~Estimate, ~`Std. Error`, ~df, ~`t value`, ~`Pr(>|t|)`,
+  "(Intercept)",  47.2883,   1.0841,       52.7313, 43.619, "< 2e-16",
+  "escs",         3.2080,    0.2582,       4852.5239, 12.425, "< 2e-16",
+  "genderMale",   0.5538,    0.4881,       4858.7923, 1.135, "0.257",
+  "skip_sch",    -4.2226,    0.5942,       4821.0841, -7.107, "1.36e-12"
+)
+
+
+install.packages("arm")
+library(arm)
+
+# Load necessary libraries
+library(lme4)
+library(ggplot2)
+library(arm)
+
+# Fit the model (math_score as outcome, escs, gender, skip_sch as fixed effects)
+model <- lmer(math_score ~ escs + gender + skip_sch + (1 | school), data = pisa_bn_stu)
+pisa_bn_math |>
+  select( gender, age, bullied, escs, books) |>
+  tbl_summary(
+  )
+
+pisa_bn_math |>
+  # mutate(school = forcats::fct_reorder(as.character(school), score)) |>
+  ggplot(aes(school, score, group = school)) +
+  geom_boxplot()
+# Create a summary table using gtsummary
+table_summary <- data_dictionary %>%
+  tbl_summary(
+    by = Level, # Split by "Level" (Student-Level, School-Level)
+    label = list(
+      `Variable Name` ~ "Variable Name",
+      Description ~ "Description",
+      `Original Code` ~ "Original Code"
+    ),
+    missing = "no" # Remove missing data footnote
+  ) %>%
+  bold_labels()
+table_summary
+
+library(dplyr)
+library(gtsummary)
+
+pisa_bn_math %>%
+  select(gender, age, bullied, escs, books, skip_sch, digital_devices, mother, father, language, school_type, location,
+         boys, girls, heritage_language, special_learning, underprivileged_household, immigrant_students, immigrant_parents, refugee_students) %>%
+  tbl_summary()
 
 
 
+# Load necessary libraries
+library(lme4)
+library(ggplot2)
+
+# Fit the multilevel model (with random intercepts for schools)
+model2 <- lmer(math_score ~ escs + skip_sch + gender + (1 | school), data = pisa_bn_math)
+
+# Extract random effects (random intercepts for schools)
+random_intercepts <- ranef(model2)$school
+
+# Convert random intercepts to a data frame for plotting
+random_intercepts_df <- data.frame(school = rownames(random_intercepts), 
+                                   random_intercept = random_intercepts[,1])
+
+# Calculate standard errors for the random effects
+random_intercepts_se <- attr(ranef(model2)$school, "postVar")[1, 1, ]
+random_intercepts_df$se <- sqrt(random_intercepts_se)
+
+# Calculate confidence intervals (95%)
+random_intercepts_df$lower <- random_intercepts_df$random_intercept - 1.96 * random_intercepts_df$se
+random_intercepts_df$upper <- random_intercepts_df$random_intercept + 1.96 * random_intercepts_df$se
+
+# Create the caterpillar plot using ggplot2
+ggplot(random_intercepts_df, aes(x = reorder(school, random_intercept), y = random_intercept)) +
+  geom_point() +  # Plot the random intercepts
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +  # Add confidence intervals
+  coord_flip() +  # Flip coordinates for readability
+  theme_minimal() +  # Clean and minimal theme
+  labs(title = "Caterpillar Plot of Random Intercepts by School",
+       x = "School",
+       y = "Random Intercept (Deviation from Overall Mean)") +
+  theme(axis.text.y = element_text(size = 6))  # Adjust text size for school labels
 
 
