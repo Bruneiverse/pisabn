@@ -106,7 +106,7 @@ library(lme4)
 library(tibble)
 
 # Fit the multilevel model
-model2 <- lmer(math_score ~ escs + skip_sch + gender + (1 | school), data = pisa_bn_stu)
+model2 <- lmer(score ~ escs + skip_sch + gender + (1 | school), data = pisa_bn_math)
 
 # Extract fixed effects
 fixed_effects <- summary(model2)$coefficients
@@ -159,7 +159,7 @@ library(ggplot2)
 library(arm)
 
 # Fit the model (math_score as outcome, escs, gender, skip_sch as fixed effects)
-model <- lmer(math_score ~ escs + gender + skip_sch + (1 | school), data = pisa_bn_stu)
+model <- lmer(score ~ escs + gender + skip_sch + (1 | school), data = pisa_bn_math)
 pisa_bn_math |>
   select( gender, age, bullied, escs, books) |>
   tbl_summary(
@@ -198,7 +198,7 @@ library(lme4)
 library(ggplot2)
 
 # Fit the multilevel model (with random intercepts for schools)
-model2 <- lmer(math_score ~ escs + skip_sch + gender + (1 | school), data = pisa_bn_math)
+model2 <- lmer(score ~ escs + skip_sch + gender + (1 | school), data = pisa_bn_math)
 
 # Extract random effects (random intercepts for schools)
 random_intercepts <- ranef(model2)$school
