@@ -458,13 +458,12 @@ summary_data_mat <- pisa_asean_math %>%
   group_by(country, mat_deg) %>%
   summarize(mean_score = mean(score, na.rm = TRUE))
 
-# Plot interaction effect with geom_line
-mother <- ggplot(summary_data_mat, aes(x = country, y = mean_score, color = mat_deg, group = mat_deg)) +
-  geom_line(size = 1) +
+mother <- ggplot(summary_data_mat, aes(x = country, y = mean_score, fill = mat_deg)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
   labs(
     x = "Country",
-    y = "Mean Maths Score",
-    color = "Mother's Degree Qualification"
+    y = "Mean Maths Scores",
+    fill = "Mother's Degree Qualification"
   ) +
   theme_minimal()
 
@@ -477,12 +476,12 @@ summary_data_pat <- pisa_asean_math %>%
   group_by(country, pat_deg) %>%
   summarize(mean_score = mean(score, na.rm = TRUE))
 
-father <- ggplot(summary_data_pat, aes(x = country, y = mean_score, color = pat_deg, group = pat_deg)) +
-  geom_line(size = 1) +
+father <- ggplot(summary_data_pat, aes(x = country, y = mean_score, fill = pat_deg)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
   labs(
     x = "Country",
-    y = "Mean Maths Score",
-    color = "Father's Degree Qualification"
+    y = "Mean Maths Scores",
+    fill = "Father's Degree Qualification"
   ) +
   theme_minimal()
 
@@ -562,14 +561,14 @@ data <- data.frame(
   sd = c(19.3, 21.2, 17.5, 19.2, 29.2, 15.5, 14.4, 12.9),
   n = c(6606, 6068, 5576, 8495, 5279, 7069, 13439, 7193))
 
-data$ci_lower <- data_1$mean - 1.96 * (data$sd)
-data$ci_upper <- data_1$mean + 1.96 * (data$sd)
+data$ci_lower <- data$mean - 1.96 * (data$sd)
+data$ci_upper <- data$mean + 1.96 * (data$sd)
 
 data
 
 ggplot(data, aes(x = mean, y = reorder(country, mean))) +
-  geom_point(size = 3, color = "skyblue") +
-  geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.2, color = "gray") +
+  geom_point(size = 3, color = "red") +
+  geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.2, color = "black") +
   labs(x = "Mean Maths Score", y = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
