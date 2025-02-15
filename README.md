@@ -4,6 +4,8 @@
 # pisabn 🇧🇳
 
 <!-- badges: start -->
+
+![](https://img.shields.io/badge/brunei-yakin-yellow)
 <!-- badges: end -->
 
 This project provides R scripts that downloads the latest PISA data (SAS
@@ -11,6 +13,8 @@ files from the OECD website), reads it into R using the `{haven}`
 package, and filters the data specifically for Brunei. The processed CSV
 file is also provided for researchers interested in conducting analyses
 such as IRT and latent trait regression.
+
+[![](https://cdngnfi2.sgp1.digitaloceanspaces.com/seasia/uploads/images/11393/410661437-17973551441635058-4175323627004018976-n-1jpg)](https://seasia.co/2024/01/01/two-southeast-asian-countries-seize-the-worlds-35-highest-pisa-scores)
 
 ## Usage
 
