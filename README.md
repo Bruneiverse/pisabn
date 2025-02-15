@@ -16,6 +16,10 @@ such as IRT and latent trait regression.
 
 [![](https://cdngnfi2.sgp1.digitaloceanspaces.com/seasia/uploads/images/11393/410661437-17973551441635058-4175323627004018976-n-1jpg)](https://seasia.co/2024/01/01/two-southeast-asian-countries-seize-the-worlds-35-highest-pisa-scores)
 
+<p align="center">
+<img src="https://cdngnfi2.sgp1.digitaloceanspaces.com/seasia/uploads/images/11393/410661437-17973551441635058-4175323627004018976-n-1jpg" style="width:70%;" href="https://seasia.co/2024/01/01/two-southeast-asian-countries-seize-the-worlds-35-highest-pisa-scores" />
+</p>
+
 ## Usage
 
 If you would like to replicate the data processing steps, you can follow
