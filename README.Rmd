@@ -58,3 +58,23 @@ The data files are as follows:
 9. `CY08MSP_TCH_QQQ` (Teacher questionnaire data)
 
 To learn more about the data, consult the downloaded codebook `CY08MSP_CODEBOOK_27thJune24.xlsx`.
+
+## Data Source
+
+The data is sourced from the OECD. 
+Please visit their website for more information on the PISA data: 
+<https://www.oecd.org/en/data/datasets/pisa-2022-database.html>
+
+## License
+
+Please be aware that the use of OECD PISA data is subject to the OECD's terms and conditions. 
+For complete details regarding licensing, restrictions, and proper attribution requirements, please consult the [OECD Terms and Conditions page](https://www.oecd.org/en/about/terms-conditions.html).
+By using this repository, you agree to adhere to the citation and usage guidelines provided by the OECD.
+
+Use the following citation to reference the data:
+
+> OECD. (2024). *PISA 2022 database*. URL: https://www.oecd.org/en/data/datasets/pisa-2022-database.html
+
+## Disclaimer
+
+The code and scripts provided in this repository are offered "as is" without any warranty, either express or implied. This includes, but is not limited to, warranties of merchantability, fitness for a particular purpose, or non-infringement. Use this code at your own risk, and please refer to the OECD website for any data-specific inquiries or concerns.
